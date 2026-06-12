@@ -4,7 +4,7 @@ const rbac = require('../../middleware/rbac');
 const { bruteForceCheck } = require('../../middleware/bruteForce');
 const auth = require('../../middleware/auth');
 const { extractRequestInfo } = require('../../utils/audit');
-
+const isProduction = process.env.NODE_ENV === 'production';
 async function routes(fastify) {
   // Register
   fastify.post('/register', { preHandler: [auth, rbac('ADMIN')], schema: { tags: ['Authentication'], description: 'Register a new user (Admin only)' } }, async (req, reply) => {
@@ -25,7 +25,7 @@ async function routes(fastify) {
   fastify.post('/login', { preHandler: [bruteForceCheck], schema: { tags: ['Authentication'], description: 'Login with email and password' } }, async (req, reply) => {
     const { email, password } = z.object({ email: z.string().email(), password: z.string() }).parse(req.body);
     const result = await service.login(email, password, req.ip, req.headers['user-agent']);
-    reply.setCookie('refreshToken', result.refreshToken, { httpOnly: true, secure: false, sameSite: 'strict', path: '/api/auth/refresh' });
+    reply.setCookie('refreshToken', result.refreshToken, { httpOnly: true, secure: isProduction, sameSite: 'strict', path: '/api/auth/refresh' });
     return { accessToken: result.accessToken, refreshToken: result.refreshToken, user: result.user };
   });
 
@@ -34,7 +34,7 @@ async function routes(fastify) {
     const token = req.cookies.refreshToken || req.body.refreshToken;
     if (!token) return reply.status(400).send({ error: 'Refresh token required' });
     const tokens = await service.refreshTokens(token, req.ip);
-    reply.setCookie('refreshToken', tokens.refreshToken, { httpOnly: true, secure: false, sameSite: 'strict', path: '/api/auth/refresh' });
+    reply.setCookie('refreshToken', tokens.refreshToken, { httpOnly: true, secure: isProduction, sameSite: 'strict', path: '/api/auth/refresh' });
     return { accessToken: tokens.accessToken, refreshToken: tokens.refreshToken };
   });
 
@@ -65,6 +65,25 @@ if (!token) {
     return { csrfToken: generateToken() };
   });
 
+  // Verify email
+  fastify.post('/verify-email', async (req, reply) => {
+    const schema = z.object({ token: z.string() });
+    const { token } = schema.parse(req.body);
+    const { verifyEmail } = require('./verificationService');
+    await verifyEmail(token);
+    return { message: 'Email verified successfully. You can now log in.' };
+  });
+
+  // Resend verification email
+  fastify.post('/resend-verification', { preHandler: [auth] }, async (req, reply) => {
+    const repo = require('./repository');
+    const user = await repo.findById(req.user.id);
+    if (!user) return reply.status(404).send({ error: 'User not found' });
+    const { sendVerificationEmail } = require('./verificationService');
+    await sendVerificationEmail(user.id, user.email);
+    return { message: 'Verification email sent.' };
+  });
+
   // Forgot password
   fastify.post('/forgot-password', async (req, reply) => {
     const schema = z.object({ email: z.string().email() });
@@ -83,3 +102,4 @@ if (!token) {
 }
 
 module.exports = routes;
+

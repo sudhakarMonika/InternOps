@@ -19,6 +19,7 @@ import AuditLog from './admin/AuditLog'
 import Exports from './admin/Exports'
 import Departments from './admin/Departments'
 import useAuthStore from '../store/auth'
+import InternOpsAssistant from '../components/InternOpsAssistant'
 
 const ROLE_LABEL = { ADMIN: 'Admin', SENIOR_TL: 'Senior TL', TL: 'Team Lead', CAPTAIN: 'Captain', INTERN: 'Intern' }
 
@@ -41,6 +42,7 @@ const adminNav = [
   { path: '/analytics', label: 'Analytics', icon: '📊' },
   { path: '/audit', label: 'Audit Log', icon: '🧾' },
   { path: '/exports', label: 'Exports', icon: '⬇️' },
+  { path: '/assistant', label: 'AI Assistant', icon: '🤖' },
 ]
 
 function initials(u) {
@@ -74,7 +76,8 @@ export default function Dashboard() {
   const allItems = [...visibleNav, ...(isAdmin ? adminNav : [])]
   const current = allItems.find(n => n.path === loc.pathname) || { label: 'Dashboard', icon: '🏠' }
 
-  const handleLogout = () => { logout(); navigate('/login') }
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+  const handleLogout = () => { setShowLogoutConfirm(true) }
 
   const NavLink = ({ n }) => {
     const active = loc.pathname === n.path
@@ -157,9 +160,9 @@ export default function Dashboard() {
         </header>
 
         {/* Content */}
-        <main key={loc.pathname} className="flex-1 p-6 overflow-auto animate-fade-in-up">
+        <main key={loc.pathname} className="flex-1 overflow-auto animate-fade-in-up">
           <Routes>
-            <Route index element={<Home />} />
+            <Route index element={<div className="p-6"><Home /></div>} />
             {isManager && <Route path="team" element={<Team />} />}
             <Route path="attendance" element={<Attendance />} />
             <Route path="ratings" element={<Ratings />} />
@@ -169,6 +172,8 @@ export default function Dashboard() {
             <Route path="profile" element={<Profile />} />
             <Route path="sessions" element={<Sessions />} />
             <Route path="reports" element={<Reports />} />
+             <Route path="assistant" element={<InternOpsAssistant />} />
+} />
             {isAdmin && (
               <>
                 <Route path="admin" element={<AdminDashboard />} />
@@ -181,6 +186,40 @@ export default function Dashboard() {
           </Routes>
         </main>
       </div>
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center z-[9999] animate-fade-in">
+          <div className="bg-white rounded-3xl p-6 shadow-2xl max-w-sm w-full mx-4 border border-gray-100 animate-scale-up">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-2xl mb-4">
+                🚪
+              </div>
+              <h3 className="text-lg font-bold text-gray-950 mb-2">Confirm Logout</h3>
+              <p className="text-sm text-gray-500 mb-6">Are you sure you want to log out?</p>
+              
+              <div className="flex gap-3 w-full">
+                <button 
+                  type="button"
+                  onClick={() => setShowLogoutConfirm(false)}
+                  className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition active:scale-95"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="button"
+                  onClick={() => {
+                    setShowLogoutConfirm(false);
+                    logout();
+                    navigate('/login');
+                  }}
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-r from-rose-500 to-red-600 text-white text-sm font-semibold shadow-lg shadow-red-200 transition active:scale-95"
+                >
+                  OK
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

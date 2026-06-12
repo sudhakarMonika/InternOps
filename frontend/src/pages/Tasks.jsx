@@ -33,13 +33,26 @@ export default function Tasks() {
       form.append('image', file)
       return api.post('/proofs/submit', form, { headers: { 'Content-Type': 'multipart/form-data' } })
     },
-    onSuccess: () => { refetchProofs(); queryClient.invalidateQueries(['proofs']) },
+    onSuccess: () => { refetchProofs(); queryClient.invalidateQueries({ queryKey: ['proofs'] }) },
   })
   const verifyMutation = useMutation({ mutationFn: (proofId) => api.patch(`/proofs/${proofId}/verify`), onSuccess: () => refetchProofs() })
 
   const handleUpload = (e, taskId) => {
     const file = e.target.files[0]
-    if (file) submitMutation.mutate({ taskId, file })
+
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      alert('Only image files are allowed.')
+      return
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File size must be under 5MB.')
+      return
+    }
+
+    submitMutation.mutate({ taskId, file })
   }
 
   const overdue = (d) => new Date(d) < new Date()
