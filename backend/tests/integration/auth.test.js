@@ -128,7 +128,11 @@ describe('Auth Integration Tests', () => {
       const res = await app.inject({
         method: 'POST',
         url: '/api/auth/logout',
-       headers: { Authorization: `Bearer ${accessToken}`, 'X-CSRF-Token': csrfToken, 'Content-Type': 'application/json' },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'X-CSRF-Token': csrfToken,
+          'Content-Type': 'application/json',
+        },
         headers: {
           Authorization: `Bearer ${accessToken}`,
           'X-CSRF-Token': csrfToken,
@@ -140,13 +144,16 @@ describe('Auth Integration Tests', () => {
     });
   });
 
-// ---------- Protected Route Tests ----------
+  // ---------- Protected Route Tests ----------
   describe('Protected Routes', () => {
     beforeAll(async () => {
       const res = await app.inject({
         method: 'POST',
         url: '/api/auth/login',
-        headers: { 'X-CSRF-Token': csrfToken, 'Content-Type': 'application/json' },
+        headers: {
+          'X-CSRF-Token': csrfToken,
+          'Content-Type': 'application/json',
+        },
         payload: { email: 'admin@internops.com', password: 'Admin@123' },
       });
       const body = JSON.parse(res.body);
@@ -157,7 +164,10 @@ describe('Auth Integration Tests', () => {
       const res = await app.inject({
         method: 'GET',
         url: '/api/users/me',
-        headers: { Authorization: `Bearer ${freshAccessToken}`, 'X-CSRF-Token': csrfToken },
+        headers: {
+          Authorization: `Bearer ${freshAccessToken}`,
+          'X-CSRF-Token': csrfToken,
+        },
         headers: {
           Authorization: `Bearer ${accessToken}`,
           'X-CSRF-Token': csrfToken,
@@ -193,7 +203,10 @@ describe('Auth Integration Tests', () => {
       const res = await app.inject({
         method: 'POST',
         url: '/api/departments',
-        headers: { Authorization: `Bearer ${freshAccessToken}`, 'Content-Type': 'application/json' },
+        headers: {
+          Authorization: `Bearer ${freshAccessToken}`,
+          'Content-Type': 'application/json',
+        },
         headers: {
           Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
@@ -207,7 +220,11 @@ describe('Auth Integration Tests', () => {
       const res = await app.inject({
         method: 'POST',
         url: '/api/departments',
-        headers: { Authorization: `Bearer ${freshAccessToken}`, 'X-CSRF-Token': csrfToken, 'Content-Type': 'application/json' },
+        headers: {
+          Authorization: `Bearer ${freshAccessToken}`,
+          'X-CSRF-Token': csrfToken,
+          'Content-Type': 'application/json',
+        },
         headers: {
           Authorization: `Bearer ${accessToken}`,
           'X-CSRF-Token': csrfToken,
