@@ -49,7 +49,10 @@ module.exports = async function ratingsRoutes(fastify) {
         resourceId: rating.id,
         details: { target: rated_user_id, score },
       });
-      await sendNotification(rated_user_id, `You received a new rating: ${score}/5.`);
+      await sendNotification(
+        rated_user_id,
+        `You received a new rating: ${score}/5.`
+      );
       await notifyUser(rating.rated_user_id, 'rating-received', { rating });
 
       return reply.status(201).send(rating);

@@ -45,11 +45,15 @@ async function routes(fastify) {
         details: { target: user_id, date, status, remarks },
       });
       // Notify the intern (or rated user) if desired
-      await sendNotification(user_id, `Your attendance for ${date} has been marked as ${status}.`);
+      await sendNotification(
+        user_id,
+        `Your attendance for ${date} has been marked as ${status}.`
+      );
       await notifyUser(att.user_id, 'attendance-marked', { attendance: att });
 
       return reply.status(201).send(att);
- });
+    }
+  );
 
   // Bulk mark attendance (manager roles, ownership validated per entry)
   fastify.post(
