@@ -34,8 +34,7 @@ app.register(async function sanitizationPlugin(instance) {
 
         if (typeof val === 'string') {
           obj[key] = val.replace(/<[^>]*>/g, '');
-        }
-        else if (typeof val === 'object') {
+        } else if (typeof val === 'object') {
           sanitize(val);
         }
       }
