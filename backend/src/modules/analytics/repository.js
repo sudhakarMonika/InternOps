@@ -21,16 +21,25 @@ async function departmentAttendanceRate(departmentId, month, year) {
 async function topPerformers(role, limit = 10) {
   const res = await pool.query(
     `
-    SELECT u.id, u.full_name, u.email, AVG(r.score) as avg_rating, COUNT(r.id) as total_ratings
+    SELECT
+      u.id,
+      u.full_name,
+      u.email,
+      AVG(r.score) AS avg_rating,
+      COUNT(r.id) AS total_ratings
     FROM users u
-    JOIN ratings r ON u.id = r.rated_user_id AND r.deleted_at IS NULL
-    WHERE u.role=$1 AND u.deleted_at IS NULL
-    GROUP BY u.id
-    ORDER BY avg_rating DESC
+    LEFT JOIN ratings r
+      ON u.id = r.rated_user_id
+      AND r.deleted_at IS NULL
+    WHERE u.role = $1
+      AND u.deleted_at IS NULL
+    GROUP BY u.id, u.full_name, u.email
+    ORDER BY avg_rating DESC NULLS LAST
     LIMIT $2
-  `,
+    `,
     [role, limit]
   );
+
   return res.rows;
 }
 
