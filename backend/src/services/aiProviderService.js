@@ -122,9 +122,13 @@ async function setCachedResponse(payload, value) {
   try {
     const redis = await getRedisClient();
     if (redis) {
-      await redis.set(`ai:cache:${payload.userId}:${key}`, JSON.stringify(value), {
-        PX: CACHE_TTL_MS,
-      });
+      await redis.set(
+        `ai:cache:${payload.userId}:${key}`,
+        JSON.stringify(value),
+        {
+          PX: CACHE_TTL_MS,
+        }
+      );
       return;
     }
   } catch (error) {
