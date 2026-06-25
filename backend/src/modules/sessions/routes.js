@@ -1,8 +1,9 @@
-﻿const auth = require('../../middleware/auth');
+const auth = require('../../middleware/auth');
 const rbac = require('../../middleware/rbac');
 const sessionOwnership = require('../../middleware/sessionOwnership');
 const repo = require('./repository');
 const { createAuditLog, extractRequestInfo } = require('../../utils/audit');
+const sessionOwnership = require('../../middleware/sessionOwnership');
 
 async function routes(fastify) {
   // List own sessions
@@ -35,10 +36,13 @@ async function routes(fastify) {
   );
 
   // Revoke all other sessions
-  fastify.post('/me/revoke-all', { preHandler: [auth] }, async (req) => {
+  fastify.post('/me/revoke-all', { preHandler: [auth] }, async (req, reply) => {
     await repo.revokeAllUserSessions(req.user.id);
     await require('../auth/repository').revokeAllUserTokensRedis(req.user.id);
     await createAuditLog({
+    const { rotateAndSetCsrf } = require('../../middleware/csrf');
+    rotateAndSetCsrf(req, reply, null);
+    req.auditOnResponse = {
       userId: req.user.id,
       action: 'ALL_SESSIONS_REVOKED',
       resourceType: 'session',
@@ -56,6 +60,7 @@ async function routes(fastify) {
       await repo.revokeAllUserSessions(userId);
       await require('../auth/repository').revokeAllUserTokensRedis(userId);
       await createAuditLog({
+      req.auditOnResponse = {
         userId: req.user.id,
         action: 'ADMIN_REVOKED_USER_SESSIONS',
         resourceType: 'session',
