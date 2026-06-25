@@ -97,7 +97,7 @@ async function revokeAllUserSessions(userId) {
     await redis.del(`user_tokens:${userId}`);
     return;
   }
-  
+
   // ── Postgres fallback ──────────────────────────────────────────────────────
   await pool.query(
     'UPDATE refresh_tokens SET revoked = TRUE WHERE user_id = $1 AND revoked = FALSE',
@@ -130,7 +130,5 @@ module.exports = {
   getUserSessions,
   revokeSession,
   revokeAllUserSessions,
-  getSessionById
+  getSessionById,
 };
-
-

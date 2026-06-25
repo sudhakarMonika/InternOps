@@ -12,14 +12,11 @@ async function routes(fastify) {
 
   // Revoke a specific session
   fastify.delete(
-  '/me/:sessionId',
-  {
-    preHandler: [
-      auth,
-      sessionOwnership('sessionId'),
-    ],
-  },
-      async (req, reply) => {
+    '/me/:sessionId',
+    {
+      preHandler: [auth, sessionOwnership('sessionId')],
+    },
+    async (req, reply) => {
       const success = await repo.revokeSession(
         req.params.sessionId,
         req.user.id
@@ -71,4 +68,3 @@ async function routes(fastify) {
 }
 
 module.exports = routes;
-
