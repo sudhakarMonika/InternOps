@@ -97,12 +97,40 @@ async function revokeAllUserSessions(userId) {
     await redis.del(`user_tokens:${userId}`);
     return;
   }
-
+  
   // ── Postgres fallback ──────────────────────────────────────────────────────
   await pool.query(
     'UPDATE refresh_tokens SET revoked = TRUE WHERE user_id = $1 AND revoked = FALSE',
     [userId]
   );
 }
+async function getSessionById(sessionId, userId) {
+  const redis = await getRedisClient();
 
-module.exports = { getUserSessions, revokeSession, revokeAllUserSessions };
+  if (redis) {
+    const tokenHashes = await redis.sMembers(`user_tokens:${userId}`);
+
+    if (tokenHashes.includes(sessionId)) {
+      return { id: sessionId };
+    }
+
+    return null;
+  }
+
+  const res = await pool.query(
+    `SELECT id
+     FROM refresh_tokens
+     WHERE id = $1 AND user_id = $2`,
+    [sessionId, userId]
+  );
+
+  return res.rows[0] || null;
+}
+module.exports = {
+  getUserSessions,
+  revokeSession,
+  revokeAllUserSessions,
+  getSessionById
+};
+
+
