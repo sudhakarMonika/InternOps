@@ -58,7 +58,13 @@ function CategoryBadge({ category }) {
   );
 }
 
-function NoticeForm({ initial = {}, onSubmit, onCancel, isPending, submitLabel }) {
+function NoticeForm({
+  initial = {},
+  onSubmit,
+  onCancel,
+  isPending,
+  submitLabel,
+}) {
   const [title, setTitle] = useState(initial.title ?? '');
   const [content, setContent] = useState(initial.content ?? '');
   const [category, setCategory] = useState(initial.category ?? 'GENERAL');
@@ -81,7 +87,9 @@ function NoticeForm({ initial = {}, onSubmit, onCancel, isPending, submitLabel }
         <details className="relative w-64 group">
           <summary className="flex items-center gap-2 rounded-2xl border border-slate-200 dark:border-slate-700 px-4 py-3 text-sm text-slate-700 dark:text-slate-200 w-full justify-between bg-white dark:bg-slate-900 list-none cursor-pointer focus:ring-2 focus:ring-indigo-400/50">
             <CategoryBadge category={category} />
-            <span className="text-slate-400 text-xs transition-transform group-open:rotate-180">▼</span>
+            <span className="text-slate-400 text-xs transition-transform group-open:rotate-180">
+              ▼
+            </span>
           </summary>
           <div className="absolute z-50 mt-1 w-64 max-h-48 overflow-y-auto rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xl">
             {CATEGORIES.map((c) => (
@@ -89,7 +97,9 @@ function NoticeForm({ initial = {}, onSubmit, onCancel, isPending, submitLabel }
                 key={c}
                 onClick={() => {
                   setCategory(c);
-                  document.querySelector('details[open]')?.removeAttribute('open');
+                  document
+                    .querySelector('details[open]')
+                    ?.removeAttribute('open');
                 }}
                 className="flex cursor-pointer items-center gap-2 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm"
               >
@@ -101,7 +111,9 @@ function NoticeForm({ initial = {}, onSubmit, onCancel, isPending, submitLabel }
 
         <Btn
           disabled={isPending || !title.trim() || !content.trim()}
-          onClick={() => onSubmit({ title: title.trim(), content: content.trim(), category })}
+          onClick={() =>
+            onSubmit({ title: title.trim(), content: content.trim(), category })
+          }
         >
           {isPending ? (
             <Loader2 className="w-4 h-4 animate-spin" />
@@ -129,7 +141,8 @@ export default function Notices() {
   const user = useAuthStore((s) => s.user);
   const isAdmin = user?.role === 'ADMIN';
   const queryClient = useQueryClient();
-  const inv = () => queryClient.invalidateQueries({ queryKey: ['notices-admin'] });
+  const inv = () =>
+    queryClient.invalidateQueries({ queryKey: ['notices-admin'] });
 
   const [formKey, setFormKey] = useState(0);
   const [formError, setFormError] = useState('');
@@ -149,7 +162,8 @@ export default function Notices() {
       setFormKey((k) => k + 1);
       inv();
     },
-    onError: (err) => setFormError(err.response?.data?.error || 'Failed to create notice'),
+    onError: (err) =>
+      setFormError(err.response?.data?.error || 'Failed to create notice'),
   });
 
   const updateMut = useMutation({
@@ -185,8 +199,12 @@ export default function Notices() {
           <Megaphone className="w-6 h-6" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">Notice Board</h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Manage announcements visible on the login page</p>
+          <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
+            Notice Board
+          </h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+            Manage announcements visible on the login page
+          </p>
         </div>
       </div>
 
@@ -208,7 +226,9 @@ export default function Notices() {
       </Card>
 
       {isLoading ? (
-        <div className="flex justify-center p-8"><Spinner /></div>
+        <div className="flex justify-center p-8">
+          <Spinner />
+        </div>
       ) : notices.length === 0 ? (
         <EmptyState
           icon="📭"
@@ -218,7 +238,10 @@ export default function Notices() {
       ) : (
         <div className="flex flex-col gap-3">
           {notices.map((n) => (
-            <Card key={n.id} className={`p-5 transition-all group ${!n.is_active ? 'opacity-60' : ''}`}>
+            <Card
+              key={n.id}
+              className={`p-5 transition-all group ${!n.is_active ? 'opacity-60' : ''}`}
+            >
               {editingId === n.id ? (
                 <NoticeForm
                   initial={n}
@@ -231,19 +254,32 @@ export default function Notices() {
                 <div className="flex items-start gap-4">
                   <CategoryBadge category={n.category} />
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-slate-900 dark:text-white">{n.title}</p>
-                    <p className="text-sm text-slate-600 dark:text-slate-400 mt-1 line-clamp-2">{n.content}</p>
+                    <p className="font-bold text-slate-900 dark:text-white">
+                      {n.title}
+                    </p>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 mt-1 line-clamp-2">
+                      {n.content}
+                    </p>
                   </div>
                   <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                    <button onClick={() => setEditingId(n.id)} className="p-2 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-950/20">
+                    <button
+                      onClick={() => setEditingId(n.id)}
+                      className="p-2 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-950/20"
+                    >
                       <Pencil className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => updateMut.mutate({ id: n.id, is_active: !n.is_active })}
+                      onClick={() =>
+                        updateMut.mutate({ id: n.id, is_active: !n.is_active })
+                      }
                       className="p-2 rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/20"
                       title={n.is_active ? 'Deactivate' : 'Activate'}
                     >
-                      {n.is_active ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      {n.is_active ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
                     </button>
                     {isAdmin && (
                       <button
@@ -252,7 +288,11 @@ export default function Notices() {
                         className="p-2 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-colors"
                         title="Delete permanently"
                       >
-                        {deletingId === n.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                        {deletingId === n.id ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="w-4 h-4" />
+                        )}
                       </button>
                     )}
                   </div>

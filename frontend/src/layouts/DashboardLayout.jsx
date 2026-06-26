@@ -192,20 +192,35 @@ export default function DashboardLayout() {
           collapsed ? 'w-20' : 'w-64'
         } shrink-0 bg-gradient-to-b from-indigo-700 via-indigo-800 to-violet-950 text-white flex flex-col transition-all duration-300 ease-in-out shadow-2xl shadow-indigo-950/20`}
       >
-        <div className={`p-5 flex items-center ${collapsed ? 'justify-center' : 'justify-start'}`}>
+        <div
+          className={`p-5 flex items-center ${collapsed ? 'justify-center' : 'justify-start'}`}
+        >
           {collapsed ? (
             <div className="w-12 h-12 rounded-2xl bg-white p-2 border border-white/20 flex items-center justify-center shrink-0 shadow-lg shadow-indigo-950/20 overflow-hidden">
-              <img src={MINI_LOGO_SRC} alt="UptoSkills" className="w-full h-full object-contain" />
+              <img
+                src={MINI_LOGO_SRC}
+                alt="UptoSkills"
+                className="w-full h-full object-contain"
+              />
             </div>
           ) : (
             <div className="w-full rounded-3xl bg-white p-3 shadow-xl shadow-indigo-950/20 border border-white/20 overflow-hidden">
-              <img src={FULL_LOGO_SRC} alt="UptoSkills" className="w-full h-auto object-contain" />
+              <img
+                src={FULL_LOGO_SRC}
+                alt="UptoSkills"
+                className="w-full h-auto object-contain"
+              />
             </div>
           )}
         </div>
 
-        <nav ref={sidebarNavRef} className="flex-1 overflow-y-auto overflow-x-hidden px-3 space-y-1.5 pb-6">
-          {visibleNav.map((n) => <NavLink key={n.path} n={n} />)}
+        <nav
+          ref={sidebarNavRef}
+          className="flex-1 overflow-y-auto overflow-x-hidden px-3 space-y-1.5 pb-6"
+        >
+          {visibleNav.map((n) => (
+            <NavLink key={n.path} n={n} />
+          ))}
           {isAdmin && (
             <>
               {!collapsed && (
@@ -213,22 +228,41 @@ export default function DashboardLayout() {
                   Admin
                 </p>
               )}
-              {collapsed && <div className="my-3 mx-3 border-t border-white/10" />}
-              {adminNav.map((n) => <NavLink key={n.path} n={n} />)}
+              {collapsed && (
+                <div className="my-3 mx-3 border-t border-white/10" />
+              )}
+              {adminNav.map((n) => (
+                <NavLink key={n.path} n={n} />
+              ))}
             </>
           )}
         </nav>
 
         <div className="p-3 shrink-0">
-          <div className={`rounded-3xl border border-white/10 bg-white/10 backdrop-blur-xl flex items-center shadow-lg shadow-indigo-950/20 ${collapsed ? 'justify-center p-2.5' : 'gap-3 p-3'}`}>
-            <UserAvatar name={displayName} email={user?.email} src={avatarUrl} text="text-xs" />
+          <div
+            className={`rounded-3xl border border-white/10 bg-white/10 backdrop-blur-xl flex items-center shadow-lg shadow-indigo-950/20 ${collapsed ? 'justify-center p-2.5' : 'gap-3 p-3'}`}
+          >
+            <UserAvatar
+              name={displayName}
+              email={user?.email}
+              src={avatarUrl}
+              text="text-xs"
+            />
             {!collapsed && (
               <>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-extrabold truncate">{displayName}</p>
-                  <p className="text-[11px] text-indigo-200 truncate">{ROLE_LABEL[role] || role}</p>
+                  <p className="text-sm font-extrabold truncate">
+                    {displayName}
+                  </p>
+                  <p className="text-[11px] text-indigo-200 truncate">
+                    {ROLE_LABEL[role] || role}
+                  </p>
                 </div>
-                <button onClick={() => setShowLogoutConfirm(true)} title="Logout" className="w-9 h-9 rounded-2xl text-indigo-200 hover:text-white hover:bg-white/10 flex items-center justify-center transition">
+                <button
+                  onClick={() => setShowLogoutConfirm(true)}
+                  title="Logout"
+                  className="w-9 h-9 rounded-2xl text-indigo-200 hover:text-white hover:bg-white/10 flex items-center justify-center transition"
+                >
                   <LogOut className="w-4 h-4" />
                 </button>
               </>
@@ -240,23 +274,50 @@ export default function DashboardLayout() {
       <div className="flex-1 flex flex-col overflow-hidden">
         <header className="h-16 bg-white/85 dark:bg-slate-900/85 backdrop-blur-xl border-b border-slate-200 dark:border-slate-700 flex items-center justify-between px-4 sm:px-6 shrink-0 shadow-sm dark:shadow-none">
           <div className="flex items-center gap-3">
-            <button onClick={() => setCollapsed((c) => !c)} className="w-10 h-10 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 transition font-extrabold">
+            <button
+              onClick={() => setCollapsed((c) => !c)}
+              className="w-10 h-10 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 transition font-extrabold"
+            >
               {collapsed ? '»' : '«'}
             </button>
             <div className="hidden sm:block">
-              <p className="text-xs text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Current page</p>
-              <p className="text-sm font-extrabold text-slate-700 dark:text-slate-200">{current.label}</p>
+              <p className="text-xs text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">
+                Current page
+              </p>
+              <p className="text-sm font-extrabold text-slate-700 dark:text-slate-200">
+                {current.label}
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={() => setDark((d) => !d)} className="w-10 h-10 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center transition text-slate-600 dark:text-slate-300">
-              {dark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            <button
+              onClick={() => setDark((d) => !d)}
+              className="w-10 h-10 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center transition text-slate-600 dark:text-slate-300"
+            >
+              {dark ? (
+                <Sun className="w-5 h-5" />
+              ) : (
+                <Moon className="w-5 h-5" />
+              )}
             </button>
-            <Link to="/notifications" onClick={saveSidebarScroll} className="w-10 h-10 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center transition">
+            <Link
+              to="/notifications"
+              onClick={saveSidebarScroll}
+              className="w-10 h-10 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center transition"
+            >
               <Bell className="w-5 h-5 text-slate-600 dark:text-slate-300" />
             </Link>
-            <Link to="/profile" onClick={saveSidebarScroll} className="rounded-full hover:scale-105 transition">
-              <UserAvatar name={displayName} email={user?.email} src={avatarUrl} text="text-xs" />
+            <Link
+              to="/profile"
+              onClick={saveSidebarScroll}
+              className="rounded-full hover:scale-105 transition"
+            >
+              <UserAvatar
+                name={displayName}
+                email={user?.email}
+                src={avatarUrl}
+                text="text-xs"
+              />
             </Link>
           </div>
         </header>

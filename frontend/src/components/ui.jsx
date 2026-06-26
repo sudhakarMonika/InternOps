@@ -306,12 +306,14 @@ export function ConfirmationModal({
       if (root) root.classList.add('blur-sm', 'transition-all', 'duration-300');
     } else {
       document.body.style.overflow = 'unset';
-      if (root) root.classList.remove('blur-sm', 'transition-all', 'duration-300');
+      if (root)
+        root.classList.remove('blur-sm', 'transition-all', 'duration-300');
     }
 
     return () => {
       document.body.style.overflow = 'unset';
-      if (root) root.classList.remove('blur-sm', 'transition-all', 'duration-300');
+      if (root)
+        root.classList.remove('blur-sm', 'transition-all', 'duration-300');
     };
   }, [open]);
 

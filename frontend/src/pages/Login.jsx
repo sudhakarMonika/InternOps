@@ -7,7 +7,7 @@ import useAuthStore from '../store/auth';
 
 const UPTOSKILLS_LOGO = '/UptoSkills.webp';
 
-// Category label colours 
+// Category label colours
 const CATEGORY_STYLES = {
   REMINDER: 'text-indigo-200',
   NEWS: 'text-emerald-300',
@@ -15,7 +15,7 @@ const CATEGORY_STYLES = {
   GENERAL: 'text-slate-300',
 };
 
-// Notice list — owns its own loading / error / empty states 
+// Notice list — owns its own loading / error / empty states
 function NoticeList() {
   const {
     data: notices,
@@ -24,7 +24,7 @@ function NoticeList() {
   } = useQuery({
     queryKey: ['public-notices'],
     queryFn: () => api.get('/notices/public').then((r) => r.data),
-    staleTime: 1000 * 60 * 5, // cache for 5 min 
+    staleTime: 1000 * 60 * 5, // cache for 5 min
     retry: 1,
   });
 
@@ -58,7 +58,9 @@ function NoticeList() {
           >
             {notice.title}
           </p>
-          <p className="text-sm text-white/75 mt-1 leading-relaxed">{notice.content}</p>
+          <p className="text-sm text-white/75 mt-1 leading-relaxed">
+            {notice.content}
+          </p>
         </div>
       ))}
     </div>
@@ -85,7 +87,8 @@ export default function Login() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!email.trim() || !password) return setError('Email and password required');
+    if (!email.trim() || !password)
+      return setError('Email and password required');
     setError('');
     loginMut.mutate({ email, password });
   };
@@ -108,14 +111,24 @@ export default function Login() {
         <div className="w-full max-w-md animate-pop-in">
           <div className="text-center mb-5">
             <div className="inline-flex items-center justify-center rounded-[2rem] bg-white/[0.055] border border-white/10 px-5 py-3 shadow-2xl backdrop-blur-xl mb-4">
-              <img src={UPTOSKILLS_LOGO} alt="UptoSkills" className="w-[250px] h-auto object-contain" />
+              <img
+                src={UPTOSKILLS_LOGO}
+                alt="UptoSkills"
+                className="w-[250px] h-auto object-contain"
+              />
             </div>
-            <h1 className="text-3xl font-extrabold tracking-tight">InternOps</h1>
-            <p className="text-white/70 text-sm mt-1">Workforce &amp; Intern Management Platform</p>
+            <h1 className="text-3xl font-extrabold tracking-tight">
+              InternOps
+            </h1>
+            <p className="text-white/70 text-sm mt-1">
+              Workforce &amp; Intern Management Platform
+            </p>
           </div>
 
           <div className="rounded-3xl border border-white/10 bg-white/[0.08] backdrop-blur-xl shadow-2xl p-6 md:p-7">
-            <h2 className="text-2xl font-extrabold text-white mb-6">Welcome back</h2>
+            <h2 className="text-2xl font-extrabold text-white mb-6">
+              Welcome back
+            </h2>
             {error && (
               <div className="bg-red-500/15 border border-red-300/25 text-red-100 text-sm rounded-2xl px-4 py-3 mb-4">
                 {error}
@@ -124,28 +137,58 @@ export default function Login() {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-extrabold uppercase text-white/65 mb-2">Email</label>
+                <label className="block text-xs font-extrabold uppercase text-white/65 mb-2">
+                  Email
+                </label>
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/45" />
-                  <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full pl-12 pr-4 py-3 rounded-2xl bg-white/10 border border-white/15 outline-none focus:ring-2 focus:ring-indigo-300/25 transition" />
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="w-full pl-12 pr-4 py-3 rounded-2xl bg-white/10 border border-white/15 outline-none focus:ring-2 focus:ring-indigo-300/25 transition"
+                  />
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-extrabold uppercase text-white/65 mb-2">Password</label>
+                <label className="block text-xs font-extrabold uppercase text-white/65 mb-2">
+                  Password
+                </label>
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/45" />
-                  <input type={show ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} required className="w-full pl-12 pr-12 py-3 rounded-2xl bg-white/10 border border-white/15 outline-none focus:ring-2 focus:ring-indigo-300/25 transition" />
-                  <button type="button" onClick={() => setShow(!show)} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/45">
-                    {show ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  <input
+                    type={show ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="w-full pl-12 pr-12 py-3 rounded-2xl bg-white/10 border border-white/15 outline-none focus:ring-2 focus:ring-indigo-300/25 transition"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShow(!show)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/45"
+                  >
+                    {show ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
                   </button>
                 </div>
               </div>
-              <button type="submit" disabled={loginMut.isPending} className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-indigo-500 to-violet-600 font-extrabold transition hover:-translate-y-0.5">
+              <button
+                type="submit"
+                disabled={loginMut.isPending}
+                className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-indigo-500 to-violet-600 font-extrabold transition hover:-translate-y-0.5"
+              >
                 {loginMut.isPending ? 'Logging in...' : 'Log In'}
               </button>
             </form>
           </div>
-          <p className="text-center text-white/45 text-xs mt-4">© {new Date().getFullYear()} InternOps</p>
+          <p className="text-center text-white/45 text-xs mt-4">
+            © {new Date().getFullYear()} InternOps
+          </p>
         </div>
       </div>
 
@@ -155,7 +198,9 @@ export default function Login() {
           <div className="inline-flex items-center gap-2 bg-indigo-400/10 text-indigo-200 border border-indigo-300/15 px-3 py-1.5 rounded-full text-xs font-extrabold uppercase">
             <span>📢 InternOps Notice Board</span>
           </div>
-          <h2 className="text-3xl font-extrabold text-white">Portal Announcements</h2>
+          <h2 className="text-3xl font-extrabold text-white">
+            Portal Announcements
+          </h2>
           <div className="bg-white/[0.08] backdrop-blur-xl rounded-3xl border border-white/10 p-5 shadow-2xl">
             <NoticeList />
           </div>
