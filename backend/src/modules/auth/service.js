@@ -70,8 +70,16 @@ async function login(email, password, ip, userAgent) {
   const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
   await repo.storeRefreshTokenRedis(user.id, hashToken(refresh), expires);
 
-  // NOTE: the LOGIN audit log is intentionally NOT written here.
-  return {
+  await createAuditLog({
+  userId: user.id,
+  action: 'LOGIN',
+  resourceType: 'auth',
+  resourceId: user.id,
+  ipAddress: ip,
+  userAgent,
+});
+
+return {
     accessToken: access,
     refreshToken: refresh,
     user: {
@@ -132,5 +140,13 @@ async function logout(token, authenticatedUserId, ip, userAgent) {
   }
 
   await repo.revokeRefreshTokenRedis(hashToken(token));
+  await createAuditLog({
+  userId: authenticatedUserId,
+  action: 'LOGOUT',
+  resourceType: 'auth',
+  resourceId: authenticatedUserId,
+  ipAddress: ip,
+  userAgent,
+});
 }
 module.exports = { register, login, refreshTokens, logout };
