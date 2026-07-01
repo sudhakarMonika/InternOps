@@ -71,15 +71,15 @@ async function login(email, password, ip, userAgent) {
   await repo.storeRefreshTokenRedis(user.id, hashToken(refresh), expires);
 
   await createAuditLog({
-  userId: user.id,
-  action: 'LOGIN',
-  resourceType: 'auth',
-  resourceId: user.id,
-  ipAddress: ip,
-  userAgent,
-});
+    userId: user.id,
+    action: 'LOGIN',
+    resourceType: 'auth',
+    resourceId: user.id,
+    ipAddress: ip,
+    userAgent,
+  });
 
-return {
+  return {
     accessToken: access,
     refreshToken: refresh,
     user: {
@@ -141,12 +141,12 @@ async function logout(token, authenticatedUserId, ip, userAgent) {
 
   await repo.revokeRefreshTokenRedis(hashToken(token));
   await createAuditLog({
-  userId: authenticatedUserId,
-  action: 'LOGOUT',
-  resourceType: 'auth',
-  resourceId: authenticatedUserId,
-  ipAddress: ip,
-  userAgent,
-});
+    userId: authenticatedUserId,
+    action: 'LOGOUT',
+    resourceType: 'auth',
+    resourceId: authenticatedUserId,
+    ipAddress: ip,
+    userAgent,
+  });
 }
 module.exports = { register, login, refreshTokens, logout };
