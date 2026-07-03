@@ -133,6 +133,7 @@ async function routes(fastify) {
       },
     },
     async (req, reply) => {
+      // Prevent self-suspension
       if (req.user.id === req.params.id) {
         return reply.status(400).send({
           error: 'You cannot suspend your own account',
@@ -154,12 +155,14 @@ async function routes(fastify) {
       }
 
       await repo.suspendUser(req.params.id);
+
       req.auditOnResponse = {
         userId: req.user.id,
         action: 'USER_SUSPENDED',
         resourceType: 'user',
         resourceId: req.params.id,
       };
+
       return { message: 'Suspended' };
     }
   );
@@ -176,12 +179,14 @@ async function routes(fastify) {
     },
     async (req) => {
       await repo.activateUser(req.params.id);
+
       req.auditOnResponse = {
         userId: req.user.id,
         action: 'USER_ACTIVATED',
         resourceType: 'user',
         resourceId: req.params.id,
       };
+
       return { message: 'Activated' };
     }
   );
@@ -196,14 +201,37 @@ async function routes(fastify) {
         params: { type: 'object', properties: { id: { type: 'string' } } },
       },
     },
-    async (req) => {
+    async (req, reply) => {
+      // Prevent self-deletion
+      if (req.user.id === req.params.id) {
+        return reply.status(400).send({
+          error: 'You cannot delete your own account',
+        });
+      }
+
+      const {
+        rows: [targetUser],
+      } = await repo.getUserById(req.params.id);
+
+      if (targetUser?.role === 'ADMIN') {
+        const adminCount = await repo.countOtherActiveAdmins(req.params.id);
+
+        if (adminCount === 0) {
+          return reply.status(400).send({
+            error: 'Cannot delete the last active admin',
+          });
+        }
+      }
+
       await repo.softDeleteUser(req.params.id);
+
       req.auditOnResponse = {
         userId: req.user.id,
         action: 'USER_DELETED',
         resourceType: 'user',
         resourceId: req.params.id,
       };
+
       return { message: 'Soft-deleted' };
     }
   );
