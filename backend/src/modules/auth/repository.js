@@ -37,10 +37,7 @@ async function createUser(data) {
 
     return res.rows[0];
   } catch (err) {
-    if (
-      err.code === '23505' &&
-      err.constraint === 'users_email_active_key'
-    ) {
+    if (err.code === '23505' && err.constraint === 'users_email_active_key') {
       throw new ConflictError('A user with this email already exists');
     }
 
