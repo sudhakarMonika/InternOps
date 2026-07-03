@@ -65,6 +65,7 @@ async function routes(fastify) {
       },
     },
     async (req, reply) => {
+      const parsed = listUsersQuerySchema.safeParse(req.query);
       if (!parsed.success) {
         return reply.status(400).send({
           error: 'Invalid query parameters',
@@ -288,4 +289,4 @@ async function routes(fastify) {
   );
 }
 
-module.exports = routes;
+module.exports = routes; 
