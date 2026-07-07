@@ -18,13 +18,17 @@ function getAuthUrl(state) {
   const config = getCanvaConfig();
   if (!config.clientId) return null;
 
+  // Generate random state for CSRF protection if not provided
+  const crypto = require('crypto');
+  const stateParam = state || crypto.randomBytes(16).toString('hex');
+
   const params = new URLSearchParams({
     client_id: config.clientId,
     redirect_uri: config.redirectUri,
     response_type: 'code',
     scope:
       'design:content:read design:content:write design:meta:read brand:read',
-    state: state || 'internops',
+    state: stateParam,
   });
 
   return `${CANVA_AUTH_URL}?${params.toString()}`;

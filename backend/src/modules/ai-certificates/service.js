@@ -1,45 +1,29 @@
 const path = require('path');
 const fs = require('fs');
-const { promisify } = require('util');
-const execFile = promisify(require('child_process').execFile);
 
 // ============================================================
-// Helper: Call Python AI server
+// Helper: Call Python AI server (using native fetch)
 // ============================================================
+
+const PYTHON_SERVER_URL = process.env.PYTHON_AI_SERVER_URL || 'http://localhost:8080';
 
 async function callPythonEndpoint(endpoint, data, method = 'POST') {
-  return new Promise((resolve, reject) => {
-    const curlCommand = ['curl', '-s', '-X', method];
+  const url = `${PYTHON_SERVER_URL}${endpoint}`;
+  const options = {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+    signal: AbortSignal.timeout(30000),
+  };
 
-    // Only send body for POST/PUT/PATCH
-    if (method !== 'GET' && method !== 'HEAD') {
-      curlCommand.push('-H', 'Content-Type: application/json');
-      curlCommand.push('-d', JSON.stringify(data));
-    }
+  if (method !== 'GET' && method !== 'HEAD') {
+    options.body = JSON.stringify(data);
+  }
 
-    curlCommand.push(`http://localhost:8080${endpoint}`);
-
-    execFile(
-      'curl',
-      curlCommand.slice(1),
-      { timeout: 30000 },
-      (error, stdout, stderr) => {
-        if (error) {
-          reject(new Error(`Python server call failed: ${error.message}`));
-          return;
-        }
-
-        try {
-          const result = JSON.parse(stdout);
-          resolve(result);
-        } catch (parseError) {
-          reject(
-            new Error(`Failed to parse Python server response: ${stdout}`)
-          );
-        }
-      }
-    );
-  });
+  const response = await fetch(url, options);
+  if (!response.ok) {
+    throw new Error(`Python server returned ${response.status}`);
+  }
+  return response.json();
 }
 
 // ============================================================
@@ -923,6 +907,17 @@ Return a JSON object with key "recommendations" containing an array of objects w
 // ============================================================
 
 function renderCertificatePreview(data) {
+  // Escape HTML to prevent XSS attacks (#2)
+  function esc(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   const TEMPLATE_STYLES = {
     'Royal Gold': {
       bg: '#0d1b4b',
@@ -1011,11 +1006,11 @@ function renderCertificatePreview(data) {
 <body>
 <div class="certificate">
   <div class="header">Certificate of Achievement</div>
-  ${data.logo_url ? `<img src="${data.logo_url}" class="logo" alt="Logo">` : ''}
-  <div class="title">${data.title || 'Certificate of Achievement'}</div>
-  <div class="name">${data.recipient_name}</div>
-  <div class="body">${data.body || 'This certificate is presented in recognition of outstanding performance and achievement.'}</div>
-  <div class="closing">${data.closing || 'Congratulations'}</div>
+  ${data.logo_url ? `<img src="${esc(data.logo_url)}" class="logo" alt="Logo">` : ''}
+  <div class="title">${esc(data.title) || 'Certificate of Achievement'}</div>
+  <div class="name">${esc(data.recipient_name)}</div>
+  <div class="body">${esc(data.body) || 'This certificate is presented in recognition of outstanding performance and achievement.'}</div>
+  <div class="closing">${esc(data.closing) || 'Congratulations'}</div>
 </div>
 </body>
 </html>`;
