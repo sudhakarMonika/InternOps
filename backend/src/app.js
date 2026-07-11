@@ -1,6 +1,7 @@
 require('dotenv').config();
 const validateEnv = require('./config/validateEnv');
 validateEnv();
+const auth = require('./middleware/auth');
 
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
@@ -38,11 +39,19 @@ app.get(
 app.get(
   '/health',
   {
+    preHandler: [auth],
     config: {
       rateLimit: false,
     },
   },
   async (req, reply) => {
+
+    if (req.user.role !== 'ADMIN') {
+      return reply.status(403).send({
+        error: 'Forbidden',
+      });
+    }
+
     const redisStatus = getRedisStatus();
 
     if (process.env.NODE_ENV === 'test') {
@@ -50,23 +59,33 @@ app.get(
     }
 
     if (redisStatus === 'disconnected') {
-      return reply
-        .status(503)
-        .send({ status: 'degraded', redis: 'disconnected' });
+      return reply.status(503).send({
+        status: 'degraded',
+      });
     }
 
-    return reply.send({ status: 'ok' });
+    return reply.send({
+      status: 'ok',
+    });
   }
 );
 
 app.get(
   '/health/db',
   {
+    preHandler: [auth],
     config: {
       rateLimit: false,
     },
   },
   async (req, reply) => {
+
+    if (req.user.role !== 'ADMIN') {
+      return reply.status(403).send({
+        error: 'Forbidden',
+      });
+    }
+
     try {
       await pool.query('SELECT 1');
       reply.send({
@@ -85,12 +104,19 @@ app.get(
 app.get(
   '/health/full',
   {
+    preHandler: [auth],
     config: {
       rateLimit: false,
     },
   },
   async (req, reply) => {
-    const checks = { db: false, redis: false };
+  if (req.user.role !== 'ADMIN') {
+    return reply.status(403).send({
+      error: 'Forbidden',
+    });
+  }
+
+  const checks = { db: false, redis: false };
 
     try {
       await pool.query('SELECT 1');
