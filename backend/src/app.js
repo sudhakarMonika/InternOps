@@ -45,7 +45,6 @@ app.get(
     },
   },
   async (req, reply) => {
-
     if (req.user.role !== 'ADMIN') {
       return reply.status(403).send({
         error: 'Forbidden',
@@ -79,7 +78,6 @@ app.get(
     },
   },
   async (req, reply) => {
-
     if (req.user.role !== 'ADMIN') {
       return reply.status(403).send({
         error: 'Forbidden',
@@ -110,13 +108,13 @@ app.get(
     },
   },
   async (req, reply) => {
-  if (req.user.role !== 'ADMIN') {
-    return reply.status(403).send({
-      error: 'Forbidden',
-    });
-  }
+    if (req.user.role !== 'ADMIN') {
+      return reply.status(403).send({
+        error: 'Forbidden',
+      });
+    }
 
-  const checks = { db: false, redis: false };
+    const checks = { db: false, redis: false };
 
     try {
       await pool.query('SELECT 1');
