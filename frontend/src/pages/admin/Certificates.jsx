@@ -12,6 +12,7 @@ import {
 import {
   useCertificates,
   useGenerateCertificate,
+  useDeleteCertificate,
   useSeedTemplates,
   useTemplates,
 } from '../../hooks/useCertificates';
@@ -52,13 +53,13 @@ export default function Certificates() {
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [certToDelete, setCertToDelete] = useState(null);
-  const [deletingId, setDeletingId] = useState(null);
 
   const { data: certsData, isLoading } = useCertificates({ search });
   const certificates = certsData?.data || [];
   const { data: templatesData, isLoading: templatesLoading } = useTemplates();
   const templates = templatesData?.data || [];
   const generateMutation = useGenerateCertificate();
+  const deleteMutation = useDeleteCertificate();
   const seedMutation = useSeedTemplates();
 
   const filteredCertificates = certificates.filter(
@@ -69,10 +70,10 @@ export default function Certificates() {
   );
 
   const handleDelete = (cert) => {
-    setDeletingId(cert.id);
-    // TODO: Add delete mutation to useCertificates hook
-    // deleteMutation.mutate(cert.id);
-    setCertToDelete(null);
+    deleteMutation.mutate(cert.id, {
+      onSuccess: () => setCertToDelete(null),
+      onError: () => setCertToDelete(null),
+    });
   };
 
   const handleDownload = (cert) => {
@@ -90,7 +91,7 @@ export default function Certificates() {
         message={`Are you sure you want to permanently delete the certificate for "${certToDelete?.recipient_name}"?`}
         onConfirm={() => handleDelete(certToDelete)}
         onCancel={() => setCertToDelete(null)}
-        loading={deletingId === certToDelete?.id}
+        loading={deleteMutation.isPending}
         danger={true}
       />
 
